@@ -1,7 +1,7 @@
 package com.largefilereadingchallenge.aggregator.service;
 
 import com.largefilereadingchallenge.aggregator.domain.YearTemp;
-import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,10 +18,15 @@ public class AggregatorService {
     private Aggregator aggregator;
     private long previousModifiedTime = -1L;
 
-    @PostConstruct
-    void aggregate() {
-        final var fileName = "src/main/resources/example_file2.csv";
-        Path file = Paths.get(fileName);
+    @Value("${file.name}")
+    private String fileName;
+
+    public void aggregate() {
+        String path = getParentDirectoryFromJar();
+        System.out.println(path);
+        System.out.println("!!! filename: "+fileName);
+        Path file = Paths.get(path, fileName);
+
 
         long lastModifiedTime = getLastModifiedTimeCurrentFile(file);
         boolean isFileChanged = lastModifiedTime != previousModifiedTime;
@@ -63,5 +68,17 @@ public class AggregatorService {
     public List<YearTemp> getAvgTempForCity(String city) {
         aggregate();
         return aggregator.getAvgTemperatureByYearForCity(city);
+    }
+
+    private String getParentDirectoryFromJar() {
+        String dirtyPath = getClass().getResource("").toString();
+        String jarPath = dirtyPath.replaceAll("^.*file:/", ""); //removes file:/ and everything before it
+        jarPath = jarPath.replaceAll("jar!.*", "jar"); //removes everything after .jar, if .jar exists in dirtyPath
+        jarPath = jarPath.replaceAll("%20", " "); //necessary if path has spaces within
+        if (!jarPath.endsWith(".jar")) { // this is needed if you plan to run the app using Spring Tools Suit play button.
+            jarPath = jarPath.replaceAll("/classes/.*", "/classes/");
+        }
+        String directoryPath = "/"+Paths.get(jarPath).getParent().toString(); //Paths - from java 8
+        return directoryPath;
     }
 }
