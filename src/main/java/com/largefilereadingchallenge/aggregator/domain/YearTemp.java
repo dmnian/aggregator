@@ -26,4 +26,12 @@ public class YearTemp {
     public String getYear() {
         return this.year;
     }
+
+    @Override
+    public String toString() {
+        return "YearTemp{" +
+                "year='" + year + "'," +
+                "averageTemperature='" + this.getAverageTemperature() + '\'' +
+                '}';
+    }
 }

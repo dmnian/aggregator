@@ -1,6 +1,9 @@
 package com.largefilereadingchallenge.aggregator.service;
 
+import com.largefilereadingchallenge.aggregator.exception.CustomException;
 import com.largefilereadingchallenge.aggregator.domain.YearTemp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +18,7 @@ import java.util.stream.Stream;
 @Service
 public class AggregatorService {
 
+    private Logger log = LoggerFactory.getLogger(AggregatorService.class);
     private Aggregator aggregator;
     private long previousModifiedTime = -1L;
 
@@ -32,7 +36,7 @@ public class AggregatorService {
         boolean isFileChanged = lastModifiedTime != previousModifiedTime;
 
         if (isFileChanged) {
-            System.out.println("Aggregating...");
+            log.info("Aggregation started");
             aggregator = new Aggregator();
 
 
@@ -46,8 +50,11 @@ public class AggregatorService {
 
                     aggregator.aggregate(city, year, temperature);
                 });
+
+                log.info("Aggregation finished");
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                log.error("Aggregation error");
+                throw new CustomException(e);
             }
 
             previousModifiedTime = lastModifiedTime;
@@ -57,11 +64,11 @@ public class AggregatorService {
     private long getLastModifiedTimeCurrentFile(Path file) {
         try {
             var lastModifiedTime = Files.readAttributes(file, BasicFileAttributes.class).lastModifiedTime().toMillis();
-            System.out.println("lastModifiedTime: " + lastModifiedTime);
+           log.info("lastModifiedTime: " + lastModifiedTime);
 
             return lastModifiedTime;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new CustomException(e);
         }
     }
 
@@ -72,13 +79,13 @@ public class AggregatorService {
 
     private String getParentDirectoryFromJar() {
         String dirtyPath = getClass().getResource("").toString();
-        String jarPath = dirtyPath.replaceAll("^.*file:/", ""); //removes file:/ and everything before it
-        jarPath = jarPath.replaceAll("jar!.*", "jar"); //removes everything after .jar, if .jar exists in dirtyPath
-        jarPath = jarPath.replaceAll("%20", " "); //necessary if path has spaces within
-        if (!jarPath.endsWith(".jar")) { // this is needed if you plan to run the app using Spring Tools Suit play button.
+        String jarPath = dirtyPath.replaceAll("^.*file:/", "");
+        jarPath = jarPath.replaceAll("jar!.*", "jar");
+        jarPath = jarPath.replaceAll("%20", " ");
+        if (!jarPath.endsWith(".jar")) {
             jarPath = jarPath.replaceAll("/classes/.*", "/classes/");
         }
-        String directoryPath = "/"+Paths.get(jarPath).getParent().toString(); //Paths - from java 8
+        String directoryPath = "/"+Paths.get(jarPath).getParent().toString();
         return directoryPath;
     }
 }
