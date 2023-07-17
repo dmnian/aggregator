@@ -25,11 +25,14 @@ public class AggregatorService {
     @Value("${file.name}")
     private String fileName;
 
+    @Value("${file.minimum.size}")
+    private int fileMinSize;
+
     public void aggregate() {
         String path = getParentDirectoryFromJar();
         Path file = Paths.get(path, fileName);
 
-        long lastModifiedTime = getLastModifiedTimeCurrentFile(file);
+        long lastModifiedTime = checkAttributes(file);
         boolean isFileChanged = lastModifiedTime != previousModifiedTime;
 
         if (isFileChanged) {
@@ -57,9 +60,15 @@ public class AggregatorService {
         }
     }
 
-    private long getLastModifiedTimeCurrentFile(Path file) {
+    private long checkAttributes(Path file) {
         try {
-            final var lastModifiedTime = Files.readAttributes(file, BasicFileAttributes.class).lastModifiedTime().toMillis();
+            final var basicFileAttributes = Files.readAttributes(file, BasicFileAttributes.class);
+
+            if ((basicFileAttributes.size() / 1000000) < fileMinSize) {
+                throw new CustomException("File is too small.");
+            }
+
+            final var lastModifiedTime = basicFileAttributes.lastModifiedTime().toMillis();
             log.info("lastModifiedTime: " + lastModifiedTime);
 
             return lastModifiedTime;
