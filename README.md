@@ -1,8 +1,4 @@
 # aggregator
-TODO:
-- add custom exceptions
-- add logger
-- add tests
 
 # Large file reading challenge
 
