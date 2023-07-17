@@ -27,10 +27,7 @@ public class AggregatorService {
 
     public void aggregate() {
         String path = getParentDirectoryFromJar();
-        System.out.println(path);
-        System.out.println("!!! filename: "+fileName);
         Path file = Paths.get(path, fileName);
-
 
         long lastModifiedTime = getLastModifiedTimeCurrentFile(file);
         boolean isFileChanged = lastModifiedTime != previousModifiedTime;
