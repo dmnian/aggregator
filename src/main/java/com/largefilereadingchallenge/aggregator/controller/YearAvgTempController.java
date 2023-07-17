@@ -9,10 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController()
+@RestController
 public class YearAvgTempController {
-    @Autowired
     private AggregatorService aggregatorService;
+
+    public YearAvgTempController(AggregatorService aggregatorService) {
+        this.aggregatorService = aggregatorService;
+    }
 
     @GetMapping("/city/{city}")
     List<YearTemp> get(@PathVariable("city") String city) {
