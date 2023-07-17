@@ -1,7 +1,5 @@
 package com.largefilereadingchallenge.aggregator.domain;
 
-import java.text.DecimalFormat;
-
 public class YearTemp {
     private final String year;
     private float aggregatedTemp;
@@ -17,7 +15,6 @@ public class YearTemp {
         aggregatedTemp += temp;
         counter++;
     }
-
 
     public float getAverageTemperature() {
         return (float) (Math.round((aggregatedTemp / counter) * 100) / 100.0);

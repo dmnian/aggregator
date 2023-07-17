@@ -7,16 +7,16 @@ import java.util.List;
 import java.util.Map;
 
 public class Aggregator {
-    private final Map<String,  Map<String, YearTemp>> cityYearMap = new HashMap<>();
+    private final Map<String, Map<String, YearTemp>> cityYearMap = new HashMap<>();
 
     public void aggregate(String city, String year, float temp) {
 
         if (cityYearMap.containsKey(city)) {
-            Map<String, YearTemp> yearsForSpecificCityMap = cityYearMap.get(city);
+            final Map<String, YearTemp> yearsForSpecificCityMap = cityYearMap.get(city);
 
-            if(yearsForSpecificCityMap.containsKey(year)){
+            if (yearsForSpecificCityMap.containsKey(year)) {
                 yearsForSpecificCityMap.get(year).addTemperatureMeasurement(temp);
-            }else {
+            } else {
                 yearsForSpecificCityMap.put(year, new YearTemp(year, temp));
             }
         } else {
@@ -24,11 +24,11 @@ public class Aggregator {
 
             yearsForSpecificCityMap.put(year, new YearTemp(year, temp));
             cityYearMap.put(city, yearsForSpecificCityMap);
-		}
+        }
     }
 
-    public List<YearTemp> getAvgTemperatureByYearForCity(String city){
-        Map<String, YearTemp> yearMap = cityYearMap.get(city);
+    public List<YearTemp> getAvgTemperatureByYearForCity(String city) {
+        final Map<String, YearTemp> yearMap = cityYearMap.get(city);
         return yearMap.values().stream().toList();
     }
 }

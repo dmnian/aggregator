@@ -1,7 +1,7 @@
 package com.largefilereadingchallenge.aggregator.service;
 
-import com.largefilereadingchallenge.aggregator.exception.CustomException;
 import com.largefilereadingchallenge.aggregator.domain.YearTemp;
+import com.largefilereadingchallenge.aggregator.exception.CustomException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 @Service
 public class AggregatorService {
 
-    private Logger log = LoggerFactory.getLogger(AggregatorService.class);
+    private final Logger log = LoggerFactory.getLogger(AggregatorService.class);
     private Aggregator aggregator;
     private long previousModifiedTime = -1L;
 
@@ -36,14 +36,13 @@ public class AggregatorService {
             log.info("Aggregation started");
             aggregator = new Aggregator();
 
-
             try (Stream<String> lines = Files.lines(file)) {
                 lines.forEach(line -> {
                     final var record = line.split(";");
 
-                    String city = record[0];
-                    String year = record[1].split("-")[0];
-                    var temperature = Float.parseFloat(record[2]);
+                    final var city = record[0];
+                    final var year = record[1].split("-")[0];
+                    final var temperature = Float.parseFloat(record[2]);
 
                     aggregator.aggregate(city, year, temperature);
                 });
@@ -60,8 +59,8 @@ public class AggregatorService {
 
     private long getLastModifiedTimeCurrentFile(Path file) {
         try {
-            var lastModifiedTime = Files.readAttributes(file, BasicFileAttributes.class).lastModifiedTime().toMillis();
-           log.info("lastModifiedTime: " + lastModifiedTime);
+            final var lastModifiedTime = Files.readAttributes(file, BasicFileAttributes.class).lastModifiedTime().toMillis();
+            log.info("lastModifiedTime: " + lastModifiedTime);
 
             return lastModifiedTime;
         } catch (IOException e) {
@@ -82,7 +81,7 @@ public class AggregatorService {
         if (!jarPath.endsWith(".jar")) {
             jarPath = jarPath.replaceAll("/classes/.*", "/classes/");
         }
-        String directoryPath = "/"+Paths.get(jarPath).getParent().toString();
+        String directoryPath = "/" + Paths.get(jarPath).getParent().toString();
         return directoryPath;
     }
 }

@@ -16,21 +16,29 @@ class AggregatorApplicationTests {
     @BeforeEach
     void setUp() {
         aggregator = new Aggregator();
-
     }
 
     @Test
     void aggregate() {
-        String warszawa = "Warszawa";
-        aggregator.aggregate(warszawa, "1990", 12.25f);
-        aggregator.aggregate(warszawa, "1990", 10.75f);
-        aggregator.aggregate(warszawa, "1990", 12.50f);
+        //given
+        String city = "Warszawa";
+        String year = "1990";
 
-        List<YearTemp> avgTemperatureByYearForCity = aggregator.getAvgTemperatureByYearForCity(warszawa);
+        float temp1 = 12.25f;
+        float temp2 = 10.75f;
+        float temp3 = 12.50f;
 
-        YearTemp yearTemp = avgTemperatureByYearForCity.stream().findFirst().get();
+        //when
+        aggregator.aggregate(city, year, temp1);
+        aggregator.aggregate(city, year, temp2);
+        aggregator.aggregate(city, year, temp3);
 
-        assertEquals("1990", yearTemp.getYear());
-        assertEquals(11.83f, yearTemp.getAverageTemperature());
+        List<YearTemp> avgTemperatureByYearForCity = aggregator.getAvgTemperatureByYearForCity(city);
+
+        YearTemp result = avgTemperatureByYearForCity.stream().findFirst().get();
+
+        //then
+        assertEquals(year, result.getYear());
+        assertEquals(11.83f, result.getAverageTemperature());
     }
 }
